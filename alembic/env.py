@@ -1,35 +1,37 @@
+import sys
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
-from app.models import Base
+
+# Print the current Python path for debugging
+print("Current Python Path:", sys.path)
+
+# Add the project root to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+print("Updated Python Path:", sys.path)  # Print the updated Python path
+
+from app.models import Base  # Importing models from the app directory
 from app.config import settings
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# Alembic configuration object
 config = context.config
 
-# Set the SQLAlchemy URL
-config.set_main_option("sqlalchemy.url", f'postgresql+psycopg2://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}')
+# Set SQLAlchemy URL from the settings
+config.set_main_option(
+    "sqlalchemy.url",
+    f'postgresql+psycopg2://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
+)
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
+
+# Setup logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+# Set target metadata for migrations
 target_metadata = Base.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
@@ -43,7 +45,6 @@ def run_migrations_offline() -> None:
 
     with context.begin_transaction():
         context.run_migrations()
-
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
@@ -61,7 +62,7 @@ def run_migrations_online() -> None:
         with context.begin_transaction():
             context.run_migrations()
 
-
+# Determine whether to run migrations in online or offline mode
 if context.is_offline_mode():
     run_migrations_offline()
 else:

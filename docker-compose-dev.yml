@@ -4,28 +4,16 @@ services:
   api:
     build: .
     depends_on:
-      - postgres
+      - db
     ports:
       - "8000:8000"
     volumes:
-      - .:/usr/src/app # Removed ':ro' to allow live changes
+      - .:/usr/src/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      # Keep sensitive information in the .env.dev file
-      DATABASE_HOSTNAME: postgres
-      DATABASE_PORT: 5432
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      SECRET_KEY: ${SECRET_KEY}
-      ALGORITHM: ${ALGORITHM}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
-      # DATABASE_URL for convenience
-      DATABASE_URL: "postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOSTNAME}:${DATABASE_PORT}/${DATABASE_NAME}"
     env_file:
-      - .env.dev # Use the .env.dev file for sensitive data
+      - .env.dev
 
-  postgres:
+  db:
     image: postgres:13
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
