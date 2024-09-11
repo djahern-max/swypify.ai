@@ -8,18 +8,17 @@ from app.database import get_db
 from dotenv import load_dotenv
 import os
 
-
+# Load environment variables from .env.test
 load_dotenv(dotenv_path=".env.test")
-
 
 DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_HOSTNAME = os.getenv('DATABASE_HOSTNAME')  # Updated to match .env.test
 DATABASE_PORT = os.getenv('DATABASE_PORT')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
-
+# Create SQLAlchemy engine
+SQLALCHEMY_DATABASE_URL = f'postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -33,7 +32,6 @@ def session():
         yield db
     finally:
         db.close()
-
 
 @pytest.fixture()
 def client(session):
@@ -87,4 +85,5 @@ def test_posts(test_user, session):
     session.commit()
 
     return session.query(models.Post).all()
+
 
